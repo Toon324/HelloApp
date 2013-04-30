@@ -10,7 +10,11 @@
         android:layout_width="0dip"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:hint="@string/edit_message" />
+        android:ems="10"
+        android:hint="@string/edit_message" >
+
+        <requestFocus />
+    </EditText>
 
     <Button
         android:layout_width="wrap_content"
