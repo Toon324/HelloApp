@@ -16,6 +16,9 @@ import android.widget.ListView;
 public class MainActivity extends Activity {
 
 	public final static String EXTRA_MESSAGE = "com.example.helloapp.MESSAGE";
+	ArrayList<String> values = new ArrayList<String>();
+	ArrayList<String> list;
+	StableArrayAdapter adapter;
 
 	/**
 	 * The {@link ViewPager} that will host the section contents.
@@ -25,15 +28,27 @@ public class MainActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		if (savedInstanceState != null) {
+			 for (int x = 0; x < savedInstanceState.size(); x++ )
+				 values.add(savedInstanceState.getString("LIST VALUE " + x));
+		}
+		
+		if (values.size() == 0) {
+			values.add("Cody Swendrowski");
+			values.add("Forrest Galkepetko");
+			values.add("Casey Rogers");
+			values.add("Guest");
+		}
+		
 		setContentView(R.layout.activity_main);
 		ListView listview = (ListView) findViewById(R.id.peopleList);
-		String[] values = new String[] { "Cody Swendrowski", "Forrest Galepetko", "Casey Rogers", "Guest" };
 
-		final ArrayList<String> list = new ArrayList<String>();
-		for (int i = 0; i < values.length; ++i) {
-			list.add(values[i]);
+		list = new ArrayList<String>();
+		for (int i = 0; i < values.size(); ++i) {
+			list.add(values.get(i));
 		}
-		final StableArrayAdapter adapter = new StableArrayAdapter(this,
+		adapter = new StableArrayAdapter(this,
 				android.R.layout.simple_list_item_1, list);
 		listview.setAdapter(adapter);
 
@@ -43,19 +58,22 @@ public class MainActivity extends Activity {
 			public void onItemClick(AdapterView<?> parent, final View view,
 					int position, long id) {
 				final String item = (String) parent.getItemAtPosition(position);
+				list.remove(item);
+				adapter.notifyDataSetChanged();
 				
-				view.animate().setDuration(2000).alpha(0)
-						.withEndAction(new Runnable() {
-							@Override
-							public void run() {
-								list.remove(item);
-								adapter.notifyDataSetChanged();
-								view.setAlpha(1);
-							}
-						});
 			}
 
 		});
+	}
+	
+	@Override
+	public void onSaveInstanceState(Bundle savedInstanceState) {
+	    // Save the user's current game state
+		for (int i = 0; i < list.size(); i++)
+			savedInstanceState.putString("LIST VALUE " + i, list.get(i));
+	    
+	    // Always call the superclass so it can save the view hierarchy state
+	    super.onSaveInstanceState(savedInstanceState);
 	}
 
 }

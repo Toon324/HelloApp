@@ -8,7 +8,7 @@ import android.view.MenuItem;
 import android.widget.TextView;
 import android.support.v4.app.NavUtils;
 
-public class DisplayMessageActivity extends Activity {
+public class DisplayPerson extends Activity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
