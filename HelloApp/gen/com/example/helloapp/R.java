@@ -53,7 +53,7 @@ public final class R {
         public static final int button_useless=0x7f050005;
         public static final int edit_message=0x7f050002;
         public static final int hello_world=0x7f050007;
-        public static final int title_activity_display_message=0x7f050006;
+        public static final int title_activity_display_person=0x7f050006;
         public static final int title_activity_main=0x7f050004;
     }
     public static final class style {

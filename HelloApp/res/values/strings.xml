@@ -7,7 +7,7 @@
     <string name="button_send">Send</string>
     <string name="title_activity_main">MainActivity</string>
     <string name="button_useless">Useless Button</string>
-    <string name="title_activity_display_message">My Message</string>
+    <string name="title_activity_display_person">Expanded Information</string>
     <string name="hello_world">Hello world!</string>
 
 </resources>

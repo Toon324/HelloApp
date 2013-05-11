@@ -14,17 +14,35 @@ public class DisplayPerson extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-	    // Get the message from the intent
-	    Intent intent = getIntent();
-	    String message = intent.getStringExtra(MainActivity.EXTRA_MESSAGE);
+		// Get the message from the intent
+		Intent intent = getIntent();
 
-	    // Create the text view
-	    TextView textView = new TextView(this);
-	    textView.setTextSize(40);
-	    textView.setText(message);
+		int availability = intent.getIntExtra(
+				"com.example.helloapp.availability", -1);
 
-	    // Set the text view as the activity layout
-	    setContentView(textView);
+		// Create the text view
+		TextView textView = new TextView(this);
+		textView.setTextSize(25);
+
+		String name = intent.getStringExtra("com.example.helloapp.name");
+		String room = intent.getStringExtra("com.example.helloapp.room");
+		String project = intent.getStringExtra("com.example.helloapp.project");
+
+		if (availability == R.drawable.gone)
+			textView.setText(name + " is not currently in-building. \n \n"
+					+ name + " was last working on Project " + project + ".");
+
+		else if (availability == R.drawable.busy)
+			textView.setText(name + " is busy in Room " + room + "." + "\n \n"
+					+ name + " is currently working on Project " + project
+					+ ".");
+		else
+			textView.setText(name + " is available in Room " + room + "."
+					+ "\n \n" + name + " is currently working on Project "
+					+ project + ".");
+
+		// Set the text view as the activity layout
+		setContentView(textView);
 	}
 
 	/**
