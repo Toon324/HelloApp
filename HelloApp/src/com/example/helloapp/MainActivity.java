@@ -24,6 +24,7 @@ public class MainActivity extends Activity {
 	ListAdapter adapter;
 	ListHelper helper;
 	ListView listview;
+	ArrayList<ListHelper> data;
 	Cursor model;
 
 	/**
@@ -36,26 +37,33 @@ public class MainActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		
-		helper = new ListHelper(this, "helper", null, 1);
+		data = new ArrayList<ListHelper>();
 		
 		if (savedInstanceState != null) {
 			for (int x = 0; x < savedInstanceState.size(); x++)
 				values.add(savedInstanceState.getString("LIST VALUE " + x));
 		}
-
+		
 		else {
-			helper.insert("Cody Swendrowski", "101", 1, "CEA");
-			helper.insert("Forrest", "101", 0, "Soil Samples");
-			helper.insert("Casey Rogers", "208", 1, "Wall Section");
+			helper = new ListHelper();
+			helper.setData("Cody Swendrowski", "101", 2, "CEA");
+			data.add(helper);
+			
+			helper = new ListHelper();
+			helper.setData("Forrest", "Away", 0, "Soil Samples");
+			data.add(helper);
+			
+			helper = new ListHelper();
+			helper.setData("Casey Rogers", "208", 1, "Wall Section");
+			data.add(helper);
 		}
 		
 		listview = (ListView) findViewById(R.id.peopleList);
 
 		list = new ArrayList<String>();
-		for (int i = 0; i < values.size(); ++i) {
-			list.add(values.get(i));
-		}
-		//adapter = new ListAdapter(details, this);
+		
+		adapter = new ListAdapter(data, this);
+		
 		listview.setAdapter(adapter);
 
 		listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -63,11 +71,11 @@ public class MainActivity extends Activity {
 			@Override
 			public void onItemClick(AdapterView<?> parent, final View view,
 					int position, long id) {
-				final String item = (String) parent.getItemAtPosition(position);
+				final String item = parent.getItemAtPosition(position).toString();
 				//list.remove(item);
 				//adapter.notifyDataSetChanged();
 				Toast.makeText(getApplicationContext(),
-						item.toString(), Toast.LENGTH_LONG)
+						item, Toast.LENGTH_LONG)
 						.show();
 			}
 
