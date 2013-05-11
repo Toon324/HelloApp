@@ -35,8 +35,14 @@ public class ListHelper {
 		this.icon = availability;
 		this.project = project;
 		
-		if (availability == 0)
+		if (availability == 0) {
 			this.room = "Out of Building";
+			icon = R.drawable.gone;
+		}
+		else if (availability == 1)
+			icon = R.drawable.busy;
+		else if (availability == 2)
+			icon = R.drawable.available;
 
 	}
 
@@ -49,12 +55,7 @@ public class ListHelper {
 	}
 
 	public int getAvailability() {
-		if (icon == 0)
-			return R.drawable.gone;
-		else if (icon == 1)
-			return R.drawable.busy;
-		else
-			return R.drawable.available;
+		return icon;
 	}
 
 	public String getProject() {

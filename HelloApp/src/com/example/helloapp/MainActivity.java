@@ -42,8 +42,17 @@ public class MainActivity extends Activity {
 		data = new ArrayList<ListHelper>();
 
 		if (savedInstanceState != null) {
-			for (int x = 0; x < savedInstanceState.size(); x++)
-				values.add(savedInstanceState.getString("LIST VALUE " + x));
+			for (int x = 0; x < savedInstanceState.size() / 4; x++) {
+				helper = new ListHelper();
+				
+				int availability = savedInstanceState.getInt("Availability" + x);
+				String name = savedInstanceState.getString("Name" + x);
+				String room = savedInstanceState.getString("Room" + x);
+				String project = savedInstanceState.getString("Project" + x);
+				
+				helper.setData(name, room, availability, project);
+				data.add(helper);
+			}
 		}
 
 		else {
@@ -93,9 +102,15 @@ public class MainActivity extends Activity {
 
 	@Override
 	public void onSaveInstanceState(Bundle savedInstanceState) {
-		// Save the user's current game state
-		for (int i = 0; i < list.size(); i++)
-			savedInstanceState.putString("LIST VALUE " + i, list.get(i));
+		
+		for (int x=0; x < data.size(); x++) {
+			ListHelper lh = data.get(x);
+			savedInstanceState.putInt("Availability" + x, lh.getAvailability());
+			savedInstanceState.putString("Name" + x, lh.getName());
+			savedInstanceState.putString("Room" + x, lh.getRoom());
+			savedInstanceState.putString("Project" + x, lh.getProject());
+		}
+			
 
 		// Always call the superclass so it can save the view hierarchy state
 		super.onSaveInstanceState(savedInstanceState);
