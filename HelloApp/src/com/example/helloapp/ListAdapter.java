@@ -24,7 +24,7 @@ public class ListAdapter extends BaseAdapter {
 
 	public ListAdapter(ArrayList<ListHelper> values, Context context) {
 		this.context = context;
-		data = values;
+		data = (ArrayList<ListHelper>) values.clone();
 	}
 
 	public View getView(int position, View convertView, ViewGroup parent) {

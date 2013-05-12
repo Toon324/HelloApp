@@ -1,5 +1,7 @@
 package com.example.helloapp;
 
+import android.util.Log;
+
 
 /**
  * @author Cody
@@ -27,13 +29,13 @@ public class ListHelper {
 
 	
 
-	public void setData(String name, String room, int availability,
-			String project) {
+	public void setData(String newName, String newRoom, int availability,
+			String newProject) {
 
-		this.name = name;
-		this.room = room;
-		this.icon = availability;
-		this.project = project;
+		name = newName;
+		room = newRoom;
+		icon = availability;
+		project = newProject;
 		
 		if (availability == 0) {
 			this.room = "Out of Building";
