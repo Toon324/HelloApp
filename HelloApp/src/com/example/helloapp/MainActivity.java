@@ -1,12 +1,16 @@
 package com.example.helloapp;
 
+import java.io.BufferedOutputStream;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 import android.app.Activity;
 import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.IntentFilter.MalformedMimeTypeException;
 import android.database.Cursor;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
@@ -35,6 +39,7 @@ public class MainActivity extends Activity {
 	ListView listview;
 	private static ArrayList<ListHelper> data;
 	Cursor model;
+	String delim = "<break>";
 
 	NfcAdapter nfc;
 	PendingIntent pending;
@@ -62,13 +67,61 @@ public class MainActivity extends Activity {
 				String project = savedInstanceState.getString("Project" + x);
 
 				Log.d("Hi", name + " is restored as " + availability);
-				
+
 				helper.setData(name, room, availability, project);
 				data.add(helper);
 			}
 		}
 
 		else {
+			try {
+				FileInputStream input = openFileInput("people_file");
+				Scanner inputScanner = new Scanner(input);
+				ListHelper helper = new ListHelper();
+				Log.d("INFO",
+						"Does inputScanner have next? "
+								+ inputScanner.hasNext());
+				while (inputScanner.hasNextLine()) {
+					String line = inputScanner.nextLine();
+					Log.d("INFO", "Line found: " + line);
+					Scanner lineScan = new Scanner(line);
+					lineScan.useDelimiter(delim);
+					while (lineScan.hasNext()) {
+						helper = new ListHelper();
+						int avail = Integer.parseInt(lineScan.next());
+						String name = lineScan.next();
+						String room = lineScan.next();
+						String project = lineScan.next();
+						helper.setData(name, room, avail, project);
+						data.add(helper);
+					}
+				}
+				for (ListHelper hp : data)
+					Log.d("HI",
+							hp.getName() + " is inputted as "
+									+ hp.getAvailability());
+			} catch (Exception e) {
+				Log.d("ERROR", e.toString());
+				ListHelper helper = new ListHelper();
+				helper.setData("Cody Swendrowski", "101", 0, "CEA");
+				data.add(helper);
+
+				helper = new ListHelper();
+				helper.setData("Forrest", "Away", 0, "Soil Samples");
+				data.add(helper);
+
+				helper = new ListHelper();
+				helper.setData("Casey Rogers", "208", 1, "Wall Section");
+				data.add(helper);
+
+				for (ListHelper hp : data)
+					Log.d("HI",
+							hp.getName() + " is created as "
+									+ hp.getAvailability());
+			}
+		}
+
+		if (data.size() == 0) {
 			ListHelper helper = new ListHelper();
 			helper.setData("Cody Swendrowski", "101", 0, "CEA");
 			data.add(helper);
@@ -80,44 +133,18 @@ public class MainActivity extends Activity {
 			helper = new ListHelper();
 			helper.setData("Casey Rogers", "208", 1, "Wall Section");
 			data.add(helper);
+
+			for (ListHelper hp : data)
+				Log.d("HI",
+						hp.getName() + " is created as " + hp.getAvailability());
 		}
 	}
 
 	public void onStart() {
 		super.onStart();
-		
-		nfc = NfcAdapter.getDefaultAdapter(this);
 
-		if (nfc.ACTION_NDEF_DISCOVERED.equals(getIntent().getAction())) {
-			for (ListHelper hp : data)
-				Log.d("HI", hp.getName() + " is NFC as " + hp.getAvailability());
-
-			Intent intent = getIntent();
-			String name = getNdefMessages(intent);
-			if (name == null)
-				return;
-
-			Object[] temp = data.toArray();
-			data.clear();
-			for (int x = 0; x < temp.length; x++) {
-				ListHelper help = (ListHelper) temp[x];
-				if (help.getName().equals(name)) {
-					Log.d("HI", help.getAvailability() + " is equal to? " + R.drawable.gone);
-					if (help.getAvailability() == R.drawable.gone) {
-						help.setData(help.getName(), help.getRoom(), 2,
-								help.getProject());
-						Log.d("Hi", "Set " + help.getName() + " In-building. Is now " + help.getAvailability());
-					}
-					else
-						help.setData(help.getName(), help.getRoom(),
-								2, help.getProject());
-				}
-				data.add(help);
-			}
-		}
-		
 		setContentView(R.layout.activity_main);
-		
+
 		listview = (ListView) findViewById(R.id.peopleList);
 
 		list = new ArrayList<String>();
@@ -148,16 +175,83 @@ public class MainActivity extends Activity {
 			}
 
 		});
-		
+
 		for (ListHelper hp : data)
 			Log.d("HI", hp.getName() + " is started as " + hp.getAvailability());
 	}
 
+	public void onStop() {
+		super.onStop();
+
+		try {
+			FileOutputStream fos = openFileOutput("people_file",
+					Context.MODE_PRIVATE);
+			BufferedOutputStream writer = new BufferedOutputStream(fos);
+			for (ListHelper lh : data) {
+				writer.write(("" + lh.getAvailability() + delim).getBytes());
+				writer.write((lh.getName() + delim).getBytes());
+				writer.write((lh.getRoom() + delim).getBytes());
+				writer.write((lh.getProject() + delim).getBytes());
+				writer.flush();
+				Log.d("INFO", "Wrote " + lh.getName() + " to file people_file");
+			}
+			fos.close();
+		} catch (Exception e) {
+			Log.d("ERROR", e.getMessage());
+		}
+	}
+
+	public void onResume() {
+		super.onResume();
+
+		nfc = NfcAdapter.getDefaultAdapter(this);
+
+		for (ListHelper hp : data)
+			Log.d("HI",
+					hp.getName() + " entered resume as " + hp.getAvailability());
+
+		Log.d("Action", getIntent().getAction() + "?"
+				+ NfcAdapter.ACTION_NDEF_DISCOVERED);
+		if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(getIntent().getAction())) {
+
+			for (ListHelper hp : data)
+				Log.d("HI", hp.getName() + " is NFC as " + hp.getAvailability());
+
+			Intent intent = getIntent();
+			String name = getNdefMessages(intent);
+			if (name == null)
+				return;
+
+			Object[] temp = data.toArray();
+			data.clear();
+			for (int x = 0; x < temp.length; x++) {
+				ListHelper help = (ListHelper) temp[x];
+				if (help.getName().equals(name)) {
+					Log.d("HI", help.getAvailability() + " is equal to? "
+							+ R.drawable.gone);
+					if (help.getAvailability() == R.drawable.gone) {
+						help.setData(help.getName(), "101", 2,
+								help.getProject());
+						Log.d("Hi",
+								"Set " + help.getName()
+										+ " In-building. Is now "
+										+ help.getAvailability());
+					} else {
+						help.setData(help.getName(), help.getRoom(), 0,
+								help.getProject());
+						Log.d("Hi",
+								"Set " + help.getName()
+										+ " out-of-building. Is now "
+										+ help.getAvailability());
+					}
+				}
+				data.add(help);
+			}
+		}
+	}
+
 	@Override
 	public void onSaveInstanceState(Bundle savedInstanceState) {
-		
-		for (ListHelper hp : data)
-			Log.d("HI", hp.getName() + " is saved as " + hp.getAvailability());
 
 		for (int x = 0; x < data.size(); x++) {
 			ListHelper lh = data.get(x);
