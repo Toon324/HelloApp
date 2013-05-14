@@ -10,6 +10,7 @@ import android.util.Log;
 public class ListHelper {
 
 	int icon;
+	String cellNumber;
 	String name;
 	String room;
 	String project;
@@ -22,6 +23,7 @@ public class ListHelper {
 	 */
 	public ListHelper() {
 		icon = -1;
+		cellNumber = "";
 		name = "";
 		room = "";
 		project = "";
@@ -30,12 +32,13 @@ public class ListHelper {
 	
 
 	public void setData(String newName, String newRoom, int availability,
-			String newProject) {
+			String newProject, String cellNum) {
 
 		name = newName;
 		room = newRoom;
 		icon = availability;
 		project = newProject;
+		cellNumber = cellNum;
 		
 		if (availability == 0) {
 			this.room = "Out of Building";
@@ -62,5 +65,9 @@ public class ListHelper {
 
 	public String getProject() {
 		return project;
+	}
+	
+	public String getCellNumber() {
+		return cellNumber;
 	}
 }

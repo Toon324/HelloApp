@@ -27,6 +27,7 @@ public class DisplayPerson extends Activity {
 		String name = intent.getStringExtra("com.example.helloapp.name");
 		String room = intent.getStringExtra("com.example.helloapp.room");
 		String project = intent.getStringExtra("com.example.helloapp.project");
+		String cellNum = intent.getStringExtra("com.example.helloapp.cellnum");
 
 		if (availability == R.drawable.gone)
 			textView.setText(name + " is not currently in-building. \n \n"
@@ -35,7 +36,7 @@ public class DisplayPerson extends Activity {
 		else if (availability == R.drawable.busy)
 			textView.setText(name + " is busy in Room " + room + "." + "\n \n"
 					+ name + " is currently working on Project " + project
-					+ ".");
+					+ ".\n" + name + "'s phone number is " + cellNum);
 		else
 			textView.setText(name + " is available in Room " + room + "."
 					+ "\n \n" + name + " is currently working on Project "

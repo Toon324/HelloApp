@@ -12,6 +12,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
+import android.net.Uri;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
@@ -65,10 +66,9 @@ public class MainActivity extends Activity {
 				String name = savedInstanceState.getString("Name" + x);
 				String room = savedInstanceState.getString("Room" + x);
 				String project = savedInstanceState.getString("Project" + x);
+				String cellNum = savedInstanceState.getString("CellNum" + x);
 
-				Log.d("Hi", name + " is restored as " + availability);
-
-				helper.setData(name, room, availability, project);
+				helper.setData(name, room, availability, project, cellNum);
 				data.add(helper);
 			}
 		}
@@ -78,12 +78,12 @@ public class MainActivity extends Activity {
 				FileInputStream input = openFileInput("people_file");
 				Scanner inputScanner = new Scanner(input);
 				ListHelper helper = new ListHelper();
-				Log.d("INFO",
+				Log.w("INFO",
 						"Does inputScanner have next? "
 								+ inputScanner.hasNext());
 				while (inputScanner.hasNextLine()) {
 					String line = inputScanner.nextLine();
-					Log.d("INFO", "Line found: " + line);
+					Log.w("INFO", "Line found: " + line);
 					Scanner lineScan = new Scanner(line);
 					lineScan.useDelimiter(delim);
 					while (lineScan.hasNext()) {
@@ -92,51 +92,37 @@ public class MainActivity extends Activity {
 						String name = lineScan.next();
 						String room = lineScan.next();
 						String project = lineScan.next();
-						helper.setData(name, room, avail, project);
+						String cellNum = lineScan.next();
+						helper.setData(name, room, avail, project, cellNum);
 						data.add(helper);
 					}
 				}
 				for (ListHelper hp : data)
-					Log.d("HI",
+					Log.w("HI",
 							hp.getName() + " is inputted as "
 									+ hp.getAvailability());
 			} catch (Exception e) {
-				Log.d("ERROR", e.toString());
-				ListHelper helper = new ListHelper();
-				helper.setData("Cody Swendrowski", "101", 0, "CEA");
-				data.add(helper);
-
-				helper = new ListHelper();
-				helper.setData("Forrest", "Away", 0, "Soil Samples");
-				data.add(helper);
-
-				helper = new ListHelper();
-				helper.setData("Casey Rogers", "208", 1, "Wall Section");
-				data.add(helper);
-
-				for (ListHelper hp : data)
-					Log.d("HI",
-							hp.getName() + " is created as "
-									+ hp.getAvailability());
+				Log.w("HI", e.toString());
 			}
 		}
 
 		if (data.size() == 0) {
 			ListHelper helper = new ListHelper();
-			helper.setData("Cody Swendrowski", "101", 0, "CEA");
+			helper.setData("Cody Swendrowski", "101", 2, "CEA", "2623128163");
 			data.add(helper);
 
 			helper = new ListHelper();
-			helper.setData("Forrest", "Away", 0, "Soil Samples");
+			helper.setData("Forrest", "Away", 0, "Soil Samples", "1234567890");
 			data.add(helper);
 
 			helper = new ListHelper();
-			helper.setData("Casey Rogers", "208", 1, "Wall Section");
+			helper.setData("Casey Rogers", "208", 1, "Wall Section", "0987654321");
 			data.add(helper);
 
 			for (ListHelper hp : data)
-				Log.d("HI",
-						hp.getName() + " is created as " + hp.getAvailability());
+				Log.w("HI",
+						hp.getName() + " is created as "
+								+ hp.getAvailability());
 		}
 	}
 
@@ -170,6 +156,7 @@ public class MainActivity extends Activity {
 				i.putExtra("com.example.helloapp.name", helper.getName());
 				i.putExtra("com.example.helloapp.room", helper.getRoom());
 				i.putExtra("com.example.helloapp.project", helper.getProject());
+				i.putExtra("com.example.helloapp.cellnum", helper.getCellNumber());
 
 				startActivity(i);
 			}
@@ -177,7 +164,7 @@ public class MainActivity extends Activity {
 		});
 
 		for (ListHelper hp : data)
-			Log.d("HI", hp.getName() + " is started as " + hp.getAvailability());
+			Log.w("HI", hp.getName() + " is started as " + hp.getAvailability());
 	}
 
 	public void onStop() {
@@ -192,12 +179,13 @@ public class MainActivity extends Activity {
 				writer.write((lh.getName() + delim).getBytes());
 				writer.write((lh.getRoom() + delim).getBytes());
 				writer.write((lh.getProject() + delim).getBytes());
+				writer.write((lh.getCellNumber() + delim).getBytes());
 				writer.flush();
-				Log.d("INFO", "Wrote " + lh.getName() + " to file people_file");
+				Log.w("INFO", "Wrote " + lh.getName() + " to file people_file");
 			}
 			fos.close();
 		} catch (Exception e) {
-			Log.d("ERROR", e.getMessage());
+			Log.w("HI", e.getMessage());
 		}
 	}
 
@@ -207,15 +195,15 @@ public class MainActivity extends Activity {
 		nfc = NfcAdapter.getDefaultAdapter(this);
 
 		for (ListHelper hp : data)
-			Log.d("HI",
+			Log.w("HI",
 					hp.getName() + " entered resume as " + hp.getAvailability());
 
-		Log.d("Action", getIntent().getAction() + "?"
+		Log.w("Action", getIntent().getAction() + "?"
 				+ NfcAdapter.ACTION_NDEF_DISCOVERED);
 		if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(getIntent().getAction())) {
 
 			for (ListHelper hp : data)
-				Log.d("HI", hp.getName() + " is NFC as " + hp.getAvailability());
+				Log.w("HI", hp.getName() + " is NFC as " + hp.getAvailability());
 
 			Intent intent = getIntent();
 			String name = getNdefMessages(intent);
@@ -227,19 +215,19 @@ public class MainActivity extends Activity {
 			for (int x = 0; x < temp.length; x++) {
 				ListHelper help = (ListHelper) temp[x];
 				if (help.getName().equals(name)) {
-					Log.d("HI", help.getAvailability() + " is equal to? "
+					Log.w("HI", help.getAvailability() + " is equal to? "
 							+ R.drawable.gone);
 					if (help.getAvailability() == R.drawable.gone) {
 						help.setData(help.getName(), "101", 2,
-								help.getProject());
-						Log.d("Hi",
+								help.getProject(), help.getCellNumber());
+						Log.w("HI",
 								"Set " + help.getName()
 										+ " In-building. Is now "
 										+ help.getAvailability());
 					} else {
 						help.setData(help.getName(), help.getRoom(), 0,
-								help.getProject());
-						Log.d("Hi",
+								help.getProject(), help.getCellNumber());
+						Log.w("HI",
 								"Set " + help.getName()
 										+ " out-of-building. Is now "
 										+ help.getAvailability());
@@ -255,11 +243,12 @@ public class MainActivity extends Activity {
 
 		for (int x = 0; x < data.size(); x++) {
 			ListHelper lh = data.get(x);
-			Log.d("Hi", "Storing " + lh.getAvailability());
+			Log.w("HI", "Storing " + lh.getAvailability());
 			savedInstanceState.putInt("Availability" + x, lh.getAvailability());
 			savedInstanceState.putString("Name" + x, lh.getName());
 			savedInstanceState.putString("Room" + x, lh.getRoom());
 			savedInstanceState.putString("Project" + x, lh.getProject());
+			savedInstanceState.putString("CellNum" + x, lh.getCellNumber());
 		}
 
 		// Always call the superclass so it can save the view hierarchy state
@@ -309,9 +298,18 @@ public class MainActivity extends Activity {
 	@Override
 	public boolean onContextItemSelected(MenuItem item) {
 		if (item.getTitle() == "Call") {
-			// Do your working
+			
+			Intent callIntent = new Intent(Intent.ACTION_DIAL);
+			callIntent.setData(Uri.parse("tel:" + data.get(0).getCellNumber()));
+			startActivity(callIntent);
+			
 		} else if (item.getTitle() == "Text") {
-			// Do your working
+			
+			Intent smsIntent = new Intent(Intent.ACTION_VIEW);
+			smsIntent.setType("vnd.android-dir/mms-sms");
+			smsIntent.putExtra("address", data.get(0).getCellNumber());
+			startActivity(smsIntent);
+			
 		} else if (item.getTitle() == "Add to Friends List") {
 			// Do your working
 		} else {
